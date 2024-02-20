@@ -59,10 +59,10 @@ class Transaction extends Model
     /**
      * @return BelongsTo
      */
-//    public function orders(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-//    {
-//        return $this->belongsTo(Orders::class);
-//    }
+   public function orders(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+   {
+       return $this->belongsTo(Orders::class);
+   }
 
     /**
      * performTransaction is a function to fetch user data from DB responsible for executing a transaction between two accounts
