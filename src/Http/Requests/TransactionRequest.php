@@ -14,7 +14,7 @@ class TransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id' => 'required',
+            'order_id' => 'nullable',
             'type' => 'required',
             'from_account_id' => 'required|integer|min:1',
             'to_account_id' => 'required|integer|min:1',

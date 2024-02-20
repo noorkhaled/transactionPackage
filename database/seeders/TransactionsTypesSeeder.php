@@ -1,7 +1,6 @@
 <?php
 
-namespace database\seeders;
-
+namespace Laravel\LaravelTransactionPackage\seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -10,10 +9,10 @@ class TransactionsTypesSeeder extends Seeder
     public function run(): void
     {
         DB::table('transactions_types')->insert([
-            ['name'=>'MerchantFees'],
+            ['name'=>'merchantFees'],
             ['name'=>'servicesFees'],
-            ['name'=>'PaymentTaxes'],
-            ['name'=>'DeliveryFees'],
+            ['name'=>'paymentTaxes'],
+            ['name'=>'deliveryFees'],
         ]);
     }
 }

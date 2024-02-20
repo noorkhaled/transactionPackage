@@ -24,7 +24,7 @@ class Transaction extends Model
     //Here are the fillable attributes that required when you want to create a new transaction
     protected $fillable = [
         //the order_id that this transaction will belong to
-        'order_id',
+       'order_id',
         //the type of the transaction
         'type',
         //the account will send the transaction
@@ -59,13 +59,13 @@ class Transaction extends Model
     /**
      * @return BelongsTo
      */
-    public function orders(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Orders::class);
-    }
+//    public function orders(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+//    {
+//        return $this->belongsTo(Orders::class);
+//    }
 
     /**
-     * performTransaction
+     * performTransaction is a function to fetch user data from DB responsible for executing a transaction between two accounts
      * @param TransactionRequest $transactionRequest
      * @return mixed
      */
@@ -77,9 +77,11 @@ class Transaction extends Model
         //Assign the type of (to) account from config file
         $to = Config::get('transactions.accountTypes.' . $data['to_type']);
 
+        // Retrieve the fromAccount and toAccount instances based on the provided account IDs
         $fromAccount = $from['model']::where($from['foreignKey'], $data['from_account_id'])->first();
         $toAccount = $to['model']::where($to['foreignKey'], $data['to_account_id'])->first();
 
+        // Update account balances based on the transaction amount
         $fromAccount->balance -= $data['amount'];
         $toAccount->balance += $data['amount'];
 
@@ -89,7 +91,7 @@ class Transaction extends Model
 
         // Create a new transaction record in the database
         return Transaction::create([
-            'order_id' => $data['order_id'],
+            'order_id' => $data['order_id'] ?? null,
             'type' => $data['type'],
             'from_type' => $data['from_type'],
             'to_type' => $data['to_type'],
@@ -102,7 +104,7 @@ class Transaction extends Model
     }
 
     /**
-     * getUserTransactions is a function for loading and displaying all user transaction in web view
+     * getUserTransactions is a function responsible for fetching transactions associated with a user's account based on the provided user ID
      * @param $id
      * @return array
      */
@@ -117,15 +119,21 @@ class Transaction extends Model
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Initialize an array to store account statements
         $accountStatements = [];
 
+        // Process each transaction
         foreach ($transactions as $transaction) {
+            // Determine if the user sent or received the transaction
             $sent = $transaction->from_account_id === $user->account_id;
+
+            // Calculate account balance before and after the transaction
             $accountBalanceBefore = $sent ?
                 $transaction->from_account_balance + $transaction->amount : $transaction->to_account_balance - $transaction->amount;
             $accountBalanceAfter = $sent ?
                 $accountBalanceBefore - $transaction->amount : $accountBalanceBefore + $transaction->amount;
 
+            // Construct account statement entry
             $accountStatements[] = [
                 'Transaction_Id' => $transaction->id,
                 'Transaction_Date' => $transaction->created_at,
@@ -138,6 +146,8 @@ class Transaction extends Model
                 'Account_Balance_After' => $accountBalanceAfter,
             ];
         }
+
+        // Return the array of account statements
         return $accountStatements;
     }
 
